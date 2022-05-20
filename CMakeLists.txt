@@ -32,6 +32,8 @@ option(NMEA_BUILD_EXAMPLES "Build examples" ON)
 option(NMEA_EXAMPLES_LINK_STATIC "Link examples statically" ON)
 option(NMEA_UNIT_TESTS "Build unit tests" ON)
 option(NMEA_UNIT_TESTS_LINK_STATIC "Link unit tests statically" ON)
+option(NMEA_BUILD_FUZZ "Build fuzzer" OFF)
+option(NMEA_FUZZ_LINK_STATIC "Link fuzzer statically" ON)
 option(NMEA_WITH_MEMCHECK "Run unit tests in valgrind" ON)
 
 if (NOT NMEA_BUILD_STATIC_LIB AND NOT NMEA_BUILD_SHARED_LIB)
@@ -80,6 +82,12 @@ if (NMEA_BUILD_STATIC_LIB)
         src/nmea/parser_static.c
         src/parsers/parse.c)
     set_target_properties(nmea PROPERTIES VERSION ${LIBNMEA_VERSION})
+
+    if (NMEA_BUILD_FUZZ)
+        target_compile_options(nmea PUBLIC -fsanitize=fuzzer-no-link,address)
+        target_link_options(nmea PUBLIC -fsanitize=address)
+    endif()
+
     target_include_directories(nmea INTERFACE src)
     if (UNIX)
         target_link_libraries(nmea ${CMAKE_DL_LIBS})
@@ -97,6 +105,12 @@ if (NMEA_BUILD_SHARED_LIB)
 
     add_library(nmea_shared SHARED ${NMEA_SRC})
     set_target_properties(nmea_shared PROPERTIES VERSION ${LIBNMEA_VERSION})
+
+    if (NMEA_BUILD_FUZZ)
+        target_compile_options(nmea_shared PUBLIC -fsanitize=fuzzer-no-link,address)
+        target_link_options(nmea_shared PUBLIC -fsanitize=address)
+    endif()
+
     target_include_directories(nmea_shared INTERFACE src)
 
     if (UNIX)
@@ -286,3 +300,9 @@ install(FILES
 # Install the export set for use with the install-tree
 # install(EXPORT ${PROJECT_NAME}Targets DESTINATION
 #  "${INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+# Optionally build fuzzer
+if (NMEA_BUILD_FUZZ)
+    message(STATUS "Building fuzzer...")
+    add_subdirectory(fuzz)
+endif()
