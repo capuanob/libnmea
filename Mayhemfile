@@ -1,0 +1,9 @@
+image: ghcr.io/capuanob/libnmea-fuzz:latest
+project: libnmea
+target: libnmea-fuzz
+tests:
+  - file://fuzz/corpus
+
+cmds:
+  - cmd: /libnmea-fuzz -close_fd_mask=2
+    libfuzzer: true
