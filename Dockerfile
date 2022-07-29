@@ -28,4 +28,4 @@ RUN split -l 1 /parse_stdin_test_in.txt /corpus/seed
 
 ## Set up fuzzing!
 ENTRYPOINT []
-CMD /libnmea-fuzz /corpus -close_fd_mask=2
+CMD /libnmea-fuzz /corpus
