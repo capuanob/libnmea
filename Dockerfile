@@ -6,10 +6,8 @@ RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y cmake clang git build-essential
 
 ## Add source code to the build stage.
-WORKDIR /
-RUN git clone https://github.com/capuanob/libnmea.git
+ADD . /libnmea
 WORKDIR /libnmea
-RUN git checkout mayhem
 
 ## Build
 RUN mkdir -p build
